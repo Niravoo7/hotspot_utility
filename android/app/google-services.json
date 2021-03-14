@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "330508963300",
+    "project_id": "kowop-9f143",
+    "storage_bucket": "kowop-9f143.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:330508963300:android:f04750b17f7ea28e1c0bf1",
+        "android_client_info": {
+          "package_name": "com.kentwilliams.hotspotutility"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "330508963300-ti0oeqq8s7d6f4p6smnihjlthdqjvo6p.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kentwilliams.hotspotutility",
+            "certificate_hash": "ecebb17595c44d0f65125e29c0b2874a46b939e0"
+          }
+        },
+        {
+          "client_id": "330508963300-m2kri7g5lk80kafug4jn4okbdrbqtnl3.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDohrCm5WFiPdqpT4MdMqa9NQxN274Z1e0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "330508963300-m2kri7g5lk80kafug4jn4okbdrbqtnl3.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
