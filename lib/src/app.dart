@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hotspotutility/constant.dart';
 import 'package:hotspotutility/src/screens/hotspots_screen.dart';
 import 'package:hotspotutility/src/screens/more_screen.dart';
+import 'package:hotspotutility/src/screens/splash_screen.dart';
 
 class App extends StatelessWidget {
   @override
@@ -11,7 +13,7 @@ class App extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.grey,
       ),
-      home: ParentWidget(),
+      home: SplashScreen(),
     );
   }
 }
@@ -41,19 +43,23 @@ class _ParentWidgetState extends State<ParentWidget> {
       body: Center(
         child: _widgetOptions.elementAt(_selectedIndex),
       ),
-      bottomNavigationBar: BottomNavigationBar(
+      bottomNavigationBar: BottomNavigationBar(backgroundColor: AppConstants.clrBlue,
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.bluetooth),
-            title: Text('Hotspots'),
+            icon: Icon(Icons.bluetooth, color: AppConstants.clrWhite,size: 30),
+            title: Padding(
+              padding: EdgeInsets.only(top: 5),
+              child: Text('SETUP',style: TextStyle(color: AppConstants.clrWhite)),
+            ),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.menu),
-            title: Text('More'),
+            icon: Icon(Icons.menu, color: AppConstants.clrWhite,size: 30),
+            title: Text('MORE',style: TextStyle(color: AppConstants.clrWhite)),
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: AppConstants.clrWhite,
+
         onTap: _onItemTapped,
       ),
     );
