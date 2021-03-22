@@ -1,8 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:hotspotutility/constant.dart';
 import 'package:hotspotutility/gen/hotspotutility.pb.dart' as protos;
+import 'package:hotspotutility/src/app.dart';
 import 'package:hotspotutility/src/screens/wifi_connect_screen.dart';
+import 'package:hotspotutility/src/widgets/appbar_widgets.dart';
+import 'package:hotspotutility/src/widgets/text_widget.dart';
 
 class WifiAvailableScreen extends StatefulWidget {
   const WifiAvailableScreen(
@@ -63,38 +67,65 @@ class _WifiAvailableScreenState extends State<WifiAvailableScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text("Available Wi-Fi Networks"),
-          actions: <Widget>[],
-        ),
+        appBar: CommonAppBar(context,() {
+
+          Navigator.pop(context);
+
+        }),
         body: SingleChildScrollView(
-            child: StreamBuilder<List<String>>(
-                stream: wifiSsidListStreamController.stream,
-                initialData: [],
-                builder: (c, snapshot) {
-                  return ListView.builder(
-                    physics: NeverScrollableScrollPhysics(),
-                    scrollDirection: Axis.vertical,
-                    shrinkWrap: true,
-                    itemCount: snapshot.data.length,
-                    itemBuilder: (context, index) {
-                      return ListTile(
-                          title: Text(snapshot.data[index].toString()),
-                          leading: snapshot.data[index].toString() ==
-                                  widget.currentWifiSsid
-                              ? Icon(
-                                  Icons.check_circle,
-                                  color: Colors.grey,
-                                  size: 24.0,
-                                  semanticLabel: 'Connected to Network',
-                                )
-                              : Icon(
-                                  Icons.wifi_lock,
-                                  color: Colors.grey,
-                                  size: 24.0,
-                                  semanticLabel: 'Available Network',
-                                ),
-                          trailing: Icon(Icons.keyboard_arrow_right),
+            child: Column(
+          children: [
+            Container(
+                padding: const EdgeInsets.only(top: 15, bottom: 5),
+                alignment: Alignment.center,
+                child: TextWidget(
+                  "AVAILABLE NETWORKS",
+                  color: AppConstants.clrGreen,
+                  fontSize: AppConstants.size_double_extra_large,
+                  fontWeight: FontWeight.bold,
+                  textAlign: TextAlign.center,
+                )),
+            Container(
+              margin:  EdgeInsets.only(top: 15,left: 10,right: 10),
+              child: StreamBuilder<List<String>>(
+                  stream: wifiSsidListStreamController.stream,
+                  initialData: [],
+                  builder: (c, snapshot) {
+                    return ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      scrollDirection: Axis.vertical,
+                      shrinkWrap: true,
+                      itemCount: snapshot.data.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          child: Container(
+                            color: Colors.transparent,
+                            padding: EdgeInsets.only(
+                                left: 25, right: 25, top: 10, bottom: 10),
+                            width: MediaQuery.of(context).size.width,
+                            child: Row(children: [
+                              Image.asset(
+                                AppConstants.img_wifi,
+                                height: 20,
+                                color: snapshot.data[index].toString() ==
+                                        widget.currentWifiSsid
+                                    ? AppConstants.clrBlue
+                                    : AppConstants.clrGrey,
+                              ),
+                              Container(
+                                  margin: EdgeInsets.only(left: 20, right: 20),
+                                  child: Text(snapshot.data[index].toString())),
+                              Flexible(
+                                  child: Container(
+                                color: Colors.transparent,
+                              )),
+                              Icon(
+                                Icons.arrow_forward_ios,
+                                size: 20,
+                                color: AppConstants.clrBlue,
+                              )
+                            ]),
+                          ),
                           onTap: () {
                             Navigator.of(context)
                                 .push(MaterialPageRoute(builder: (context) {
@@ -108,9 +139,13 @@ class _WifiAvailableScreenState extends State<WifiAvailableScreen> {
                                   wifiConnectChar: widget.wifiConnectChar,
                                   wifiRemoveChar: widget.wifiRemoveChar);
                             }));
-                          });
-                    },
-                  );
-                })));
+                          },
+                        );
+                      },
+                    );
+                  }),
+            ),
+          ],
+        )));
   }
 }

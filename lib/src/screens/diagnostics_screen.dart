@@ -2,10 +2,17 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:hotspotutility/constant.dart';
+import 'package:hotspotutility/src/widgets/appbar_widgets.dart';
+import 'package:hotspotutility/src/widgets/button_widget.dart';
+import 'package:hotspotutility/src/widgets/custom_dialog.dart';
+import 'package:hotspotutility/src/widgets/text_widget.dart';
 import 'package:share/share.dart';
 import 'package:pretty_json/pretty_json.dart';
 import 'package:http/http.dart' as http;
 import 'package:hotspotutility/gen/hotspotutility.pb.dart' as protos;
+
+import 'package:url_launcher/url_launcher.dart';
 
 class DiagnosticsScreen extends StatefulWidget {
   const DiagnosticsScreen({
@@ -63,9 +70,9 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
   Future getLastChallenge() {
     return http
         .get(
-      "https://api.helium.io/v1/hotspots/" +
+        Uri.parse("https://api.helium.io/v1/hotspots/" +
           widget.hotspotPublicKey +
-          "/challenges",
+          "/challenges"),
     )
         .then((value) {
       var parsed = json.decode(value.body);
@@ -85,10 +92,10 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
         print("Using Cursor");
         return http
             .get(
-          "https://api.helium.io/v1/hotspots/" +
+            Uri.parse( "https://api.helium.io/v1/hotspots/" +
               widget.hotspotPublicKey +
               "/challenges?cursor=" +
-              parsed['cursor'],
+              parsed['cursor']),
         )
             .then((value) {
           var parsed = json.decode(value.body);
@@ -128,7 +135,9 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
         print(diagnosticsResults);
       }
       // blockchain height http
-      http.get("https://api.helium.io/v1/blocks/height").then((value) {
+      http
+          .get(Uri.parse("https://api.helium.io/v1/blocks/height"))
+          .then((value) {
         var parsed = json.decode(value.body);
         blockchainHeight = parsed['data']['height'];
 
@@ -212,159 +221,262 @@ class _DiagnosticsScreenState extends State<DiagnosticsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                "Diagnostics Report",
-                style: TextStyle(fontSize: 17.0),
-              ),
-              Text(
-                widget.hotspotName,
-                style: TextStyle(fontSize: 15.0),
-              )
-            ],
-          ),
-          actions: <Widget>[
-            StreamBuilder<bool>(
-                stream: dataRequestCompleteStreamController.stream,
-                initialData: false,
-                builder: (c, snapshot) {
-                  if (snapshot.data == false) {
-                    return new Container(
-                        width: 50.0,
-                        height: 5.0,
-                        padding: const EdgeInsets.only(
-                            top: 10, bottom: 10, right: 10),
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Colors.black),
-                        ));
-                  } else {
-                    return Icon(null);
-                  }
-                }),
-          ],
-        ),
+        appBar: CommonAppBar(context,() {
+
+          Navigator.pop(context);
+
+        }),
         body: SingleChildScrollView(
-            child: Column(children: <Widget>[
-          StreamBuilder<String>(
-              stream: outboundConnectionStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Outbound Peer-to-Peer Connection'),
-                    subtitle: Text(snapshot.data.toString()),
+            child: Container(
+          margin: EdgeInsets.only(left: 25, right: 25),
+          child: Column(children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(bottom: 30),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Container(
+                      padding: const EdgeInsets.only(top: 15, bottom: 5),
+                      child: TextWidget(
+                        "Diagnostics Report",
+                        color: AppConstants.clrGreen,
+                        fontSize: AppConstants.size_double_extra_large,
+                        fontWeight: FontWeight.bold,
+                        textAlign: TextAlign.center,
+                      )),
+                  Text(
+                    widget.hotspotName,
+                    style: TextStyle(fontSize: 18),
                   )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: inboundConnectionStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Inbound Peer-to-Peer Connection'),
-                    subtitle: Text(snapshot.data.toString()),
-                  )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: blockchainHeightStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Blockchain Height'),
-                    subtitle: Text(snapshot.data.toString()),
-                  )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: lastChallengeStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Last Challenged'),
-                    subtitle: Text(snapshot.data.toString()),
-                  )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: fwStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Hotspot Firmware'),
-                    subtitle: Text(snapshot.data.toString()),
-                  )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: wifiMacStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Wi-Fi MAC'),
-                    subtitle: Text(snapshot.data.toString()),
-                  )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: ethMacStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Ethernet MAC'),
-                    subtitle: Text(snapshot.data.toString()),
-                  )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: natTypeStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('NAT Type'),
-                    subtitle: Text(snapshot.data.toString()),
-                  )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: ipStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('IP Address'),
-                    subtitle: Text(snapshot.data.toString()),
-                  )
-                ]);
-              }),
-          StreamBuilder<bool>(
-              stream: dataRequestCompleteStreamController.stream,
-              initialData: false,
-              builder: (c, snapshot) {
-                if (snapshot.data == true) {
-                  return RaisedButton(
-                    child: Text('SHARE'),
-                    color: Colors.black,
-                    textColor: Colors.white,
-                    onPressed: () {
-                      Share.share(prettyJson(shareData, indent: 2));
-                    },
-                  );
-                } else {
-                  return Icon(null);
-                }
-              })
-        ])));
+                ],
+              ),
+            ),
+            Container(
+              child: StreamBuilder<String>(
+                  stream: outboundConnectionStreamController.stream,
+                  initialData: '',
+                  builder: (c, snapshot) {
+                    return Column(children: <Widget>[
+                      ListTile(
+                        title: Text('Outbound Peer-to-Peer Connection',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.clrBlack)),
+                        subtitle: Text(snapshot.data.toString(),
+                            style: TextStyle(color: AppConstants.clrBlack)),
+                      )
+                    ]);
+                  }),
+            ),
+            Container(
+              child: StreamBuilder<String>(
+                  stream: inboundConnectionStreamController.stream,
+                  initialData: '',
+                  builder: (c, snapshot) {
+                    return Column(children: <Widget>[
+                      ListTile(
+                        title: Text('Inbound Peer-to-Peer Connection',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.clrBlack)),
+                        subtitle: Text(snapshot.data.toString(),
+                            style: TextStyle(color: AppConstants.clrBlack)),
+                      )
+                    ]);
+                  }),
+            ),
+            Container(
+              child: StreamBuilder<String>(
+                  stream: blockchainHeightStreamController.stream,
+                  initialData: '',
+                  builder: (c, snapshot) {
+                    return Column(children: <Widget>[
+                      ListTile(
+                        title: Text('Blockchain Height',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.clrBlack)),
+                        subtitle: Text(snapshot.data.toString(),
+                            style: TextStyle(color: AppConstants.clrBlack)),
+                      )
+                    ]);
+                  }),
+            ),
+            Container(
+              child: StreamBuilder<String>(
+                  stream: lastChallengeStreamController.stream,
+                  initialData: '',
+                  builder: (c, snapshot) {
+                    return Column(children: <Widget>[
+                      ListTile(
+                        title: Text('Last Challenged',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.clrBlack)),
+                        subtitle: Text(snapshot.data.toString(),
+                            style: TextStyle(color: AppConstants.clrBlack)),
+                      )
+                    ]);
+                  }),
+            ),
+            Container(
+              child: StreamBuilder<String>(
+                  stream: fwStreamController.stream,
+                  initialData: '',
+                  builder: (c, snapshot) {
+                    return Column(children: <Widget>[
+                      ListTile(
+                        title: Text('Hotspot Firmware',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: AppConstants.clrBlack)),
+                        subtitle: Text(snapshot.data.toString(),
+                            style: TextStyle(color: AppConstants.clrBlack)),
+                      )
+                    ]);
+                  }),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Container(
+                    child: StreamBuilder<String>(
+                        stream: wifiMacStreamController.stream,
+                        initialData: '',
+                        builder: (c, snapshot) {
+                          return Column(children: <Widget>[
+                            ListTile(
+                              title: Text('Wi-Fi MAC',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppConstants.clrBlack)),
+                              subtitle: Text(snapshot.data.toString(),
+                                  style: TextStyle(color: AppConstants.clrBlack)),
+                            )
+                          ]);
+                        }),
+                  ),flex: 1,
+                ),
+                Flexible(
+                  child: Container(
+                    child: StreamBuilder<String>(
+                        stream: ethMacStreamController.stream,
+                        initialData: '',
+                        builder: (c, snapshot) {
+                          return Column(children: <Widget>[
+                            ListTile(
+                              title: Text('Ethernet MAC',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppConstants.clrBlack)),
+                              subtitle: Text(snapshot.data.toString(),
+                                  style: TextStyle(color: AppConstants.clrBlack)),
+                            )
+                          ]);
+                        }),
+                  ),flex: 1,
+                )
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Flexible(
+                  child: Container(
+                    child: StreamBuilder<String>(
+                        stream: natTypeStreamController.stream,
+                        initialData: '',
+                        builder: (c, snapshot) {
+                          return Column(children: <Widget>[
+                            ListTile(
+                              title: Text('NAT Type',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppConstants.clrBlack)),
+                              subtitle: Text(snapshot.data.toString(),
+                                  style: TextStyle(color: AppConstants.clrBlack)),
+                            )
+                          ]);
+                        }),
+                  ),flex: 1,
+                ),
+                Flexible(
+                  child: Container(
+                    child: StreamBuilder<String>(
+                        stream: ipStreamController.stream,
+                        initialData: '',
+                        builder: (c, snapshot) {
+                          return Column(children: <Widget>[
+                            ListTile(
+                              title: Text('IP Address',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppConstants.clrBlack)),
+                              subtitle: Text(snapshot.data.toString(),
+                                  style: TextStyle(color: AppConstants.clrBlack)),
+                            )
+                          ]);
+                        }),
+                  ),flex: 1,
+                )
+              ],
+            ),
+            Container(
+              child: StreamBuilder<bool>(
+                  stream: dataRequestCompleteStreamController.stream,
+                  initialData: false,
+                  builder: (c, snapshot) {
+                    if (snapshot.data == true) {
+                      return ButtonWidget(context, AppConstants.strSendToKowop,
+                          ()async {
+
+                            final Uri params = Uri(
+                              scheme: 'mailto',
+                              path: 'Support@kowop.com',
+                              query: 'subject=Hotspot Diagnostic Report&body=$shareData', //add subject and body here
+                            );
+
+                            var url = params.toString();
+                            if (await canLaunch(url)) {
+                            await launch(url);
+                            showCustomDialog(
+                                context,
+                                "Success!",
+                                "Your diagnostic report was sent successfully to KOWOP.",
+                                "OK");
+                            } else {
+                            showCustomDialog(
+                                context,
+                                "Sending Failed!",
+                                "Please check your internet connection and try again.",
+                                "OK");
+                            throw 'Could not launch $url';
+                            }
+
+                        /*Share.share(prettyJson(shareData, indent: 2))
+                            .then((value) {
+                          showCustomDialog(
+                              context,
+                              "Success!",
+                              "Your diagnostic report was sent successfully to KOWOP.",
+                              "OK");
+                        }).catchError(() {
+                          showCustomDialog(
+                              context,
+                              "Sending Failed!",
+                              "Please check your internet connection and try again.",
+                              "OK");
+                        });*/
+
+                      }, AppConstants.clrGreen, null);
+                    } else {
+                      return Icon(null);
+                    }
+                  }),
+            )
+          ]),
+        )));
   }
 }

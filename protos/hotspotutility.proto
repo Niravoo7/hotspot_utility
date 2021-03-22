@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option java_package = "com.kentwilliams.hotspotutility";
+option java_package = "com.kowop.hotspot";
 option java_outer_classname = "Protos";
 option objc_class_prefix = "Protos";
 

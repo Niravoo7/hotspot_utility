@@ -6,16 +6,20 @@ class AppConstants{
   static const Color clrBlue = Color(0xff1678B3);
   static const Color clrGreen = Color(0xff1FB24F);
   static const Color clrBlack = Color(0xff404040);
+  static const Color clrGrey = Color(0xffA1A1A1);
   static const Color clrWhite = Color(0xffFFFFFF);
 
 
 
 //text
   static const String strHotspotSetup = "HOTSPOT SETUP";
+  static const String strHotspotSettings = "HOTSPOT SETTINGS";
   static const String strHotspotSetupDetail = "Before starting step 1,\nplease turn on Bluetooth\nin your phone settings.";
   static const String strStep1 = "1. If your hotspot is on, please\nunplug the hotspot for 5\nseconds, then plug it back in.";
   static const String strStep2 = "2. Wait 30 seconds after plugging\nin the hotspot, then press\nthe 'scan' button below.";
   static const String strScan = "SCAN";
+  static const String strConfigureWiFi = "CONFIGURE WiFi";
+  static const String strSendToKowop = "SEND TO KOWOP";
   static const String strSelectYourHotspot = "SELECT YOUR HOTSPOT";
   static const String strNoHotspotFound = "NO HOTSPOTS FOUND!";
   static const String strVersion = "Version 1.0";
@@ -42,11 +46,9 @@ class AppConstants{
   static const double size_medium = 14;
   static const double size_medium_large = 16;
   static const double size_large = 18;
-  static const double size_extra_large = 24;
-  static const double size_double_extra_large = 30;
+  static const double size_extra_large = 22;
+  static const double size_double_extra_large = 27;
   static const double size_double_extra_large1 = 35;
   static const double size_triple_extra_large = 40;
-
-
 
 }

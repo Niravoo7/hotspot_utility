@@ -12,7 +12,6 @@ class SplashState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   var _visible = true;
 
-
   startTime() async {
     var _duration = Duration(seconds: 3);
     return Timer(_duration, navigationPage);
@@ -20,9 +19,8 @@ class SplashState extends State<SplashScreen>
 
   Future navigationPage() async {
     Navigator.pushReplacement(
-        context, MaterialPageRoute(builder: (context) =>ParentWidget()));
+        context, MaterialPageRoute(builder: (context) => ParentWidget()));
   }
-
 
   @override
   initState() {
@@ -37,33 +35,14 @@ class SplashState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return Container(
       child: Scaffold(
-        body: Stack(
-          fit: StackFit.expand,
-          children: <Widget>[
-            Container(
-              decoration: BoxDecoration(
-                color: AppConstants.clrBlue,
-               ),
-            ),
-            Column(
-              children: <Widget>[
-                Flexible(
-                  flex: 37,
-                  child: Container(
-                    color: Colors.transparent,
-                  ),
-                ),
-                Image.asset(AppConstants.img_kowopLogo,color: AppConstants.clrWhite),
-                Flexible(
-                  flex: 37,
-                  child: Container(
-                    color: Colors.transparent,
-                  ),
-                ),
-
-              ],
-            ),
-          ],
+        body: Container(
+          alignment: Alignment.center,
+          height: MediaQuery.of(context).size.height,
+          width: MediaQuery.of(context).size.width,
+          decoration: BoxDecoration(
+            color: AppConstants.clrBlue,
+          ),
+          child: Image.asset(AppConstants.img_logo),
         ),
       ),
     );

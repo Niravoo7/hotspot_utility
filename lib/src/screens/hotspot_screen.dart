@@ -2,8 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
+import 'package:hotspotutility/constant.dart';
 import 'package:hotspotutility/src/screens/wifi_available_ssid_screen.dart';
 import 'package:hotspotutility/src/screens/diagnostics_screen.dart';
+import 'package:hotspotutility/src/widgets/appbar_widgets.dart';
+import 'package:hotspotutility/src/widgets/button_widget.dart';
+import 'package:hotspotutility/src/widgets/text_widget.dart';
 import 'package:http/http.dart' as http;
 
 class HotspotScreen extends StatefulWidget {
@@ -75,7 +79,8 @@ class _HotspotScreenState extends State<HotspotScreen> {
             publicKeyResult = new String.fromCharCodes(value);
             // hotspot info http
             http
-                .get("https://api.helium.io/v1/hotspots/" + publicKeyResult)
+                .get(Uri.parse(
+                    "https://api.helium.io/v1/hotspots/" + publicKeyResult))
                 .then((value) {
               var parsed = json.decode(value.body);
               hotspotNameStreamController.add(parsed['data']['name']);
@@ -156,11 +161,9 @@ class _HotspotScreenState extends State<HotspotScreen> {
                 (c) =>
                     c.uuid.toString() == "00002a25-0000-1000-8000-00805f9b34fb",
                 orElse: () => null);
-        hotspotDiagnosticsChar = hotspotService.characteristics
-            .singleWhere(
-                (c) =>
-                    c.uuid.toString() == "b833d34f-d871-422c-bf9e-8e6ec117d57e",
-                orElse: () => null);
+        hotspotDiagnosticsChar = hotspotService.characteristics.singleWhere(
+            (c) => c.uuid.toString() == "b833d34f-d871-422c-bf9e-8e6ec117d57e",
+            orElse: () => null);
         publicKeyChar = hotspotService.characteristics.singleWhere(
             (c) => c.uuid.toString() == "0a852c59-50d3-4492-bfd3-22fe58a24f01",
             orElse: () => null);
@@ -172,148 +175,232 @@ class _HotspotScreenState extends State<HotspotScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Hotspot Settings'),
-        actions: <Widget>[],
-      ),
-      body: SingleChildScrollView(
-        child: Column(children: <Widget>[
-          StreamBuilder<BluetoothDeviceState>(
-            stream: widget.device.state,
-            initialData: BluetoothDeviceState.connecting,
-            builder: (c, snapshot) => ListTile(
-                leading: (snapshot.data == BluetoothDeviceState.connected)
-                    ? Icon(Icons.bluetooth_connected)
-                    : Icon(Icons.bluetooth_disabled),
-                title: (snapshot.data == BluetoothDeviceState.connected)
-                    ? Text('Connected to Hotspot Bluetooth')
-                    : Text('Disconnected from Hotspot Bluetooth'),
-                trailing: StreamBuilder<bool>(
+    return SafeArea(
+      child: Scaffold(
+          appBar: CommonAppBar(context,() {
+
+            Navigator.pop(context);
+
+          }),
+          body: Container(
+            padding: EdgeInsets.only(left: 25, right: 25),
+            child: Column(children: <Widget>[
+              StreamBuilder<BluetoothDeviceState>(
+                stream: widget.device.state,
+                initialData: BluetoothDeviceState.connecting,
+                builder: (c, snapshot) => Container(
+                  child: ListView(
+                    shrinkWrap: true,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.only(top: 15, bottom: 15),
+                        child: TextWidget(
+                          AppConstants.strHotspotSettings,
+                          color: AppConstants.clrGreen,
+                          fontSize: AppConstants.size_double_extra_large,
+                          fontWeight: FontWeight.bold,
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Image.asset(AppConstants.img_bluetooth,
+                                color: (snapshot.data ==
+                                        BluetoothDeviceState.connected)
+                                    ? AppConstants.clrBlue
+                                    : AppConstants.clrGrey,
+                                height: 25),
+                            Container(
+                              margin: EdgeInsets.only(left: 20, right: 20),
+                              child: Text(
+                                (snapshot.data == BluetoothDeviceState.connected)
+                                    ? 'Connected via Bluetooth'
+                                    : 'Disconnected from Bluetooth',
+                                style: TextStyle(
+                                    color: (snapshot.data ==
+                                            BluetoothDeviceState.connected)
+                                        ? AppConstants.clrBlue
+                                        : AppConstants.clrGrey,
+                                    fontSize: AppConstants.size_medium_large),
+                              ),
+                            ),
+                            StreamBuilder<bool>(
+                                stream: charReadStatusStreamController.stream,
+                                initialData: false,
+                                builder: (c, snapshot) {
+                                  if (snapshot.data == false) {
+                                    return CircularProgressIndicator(
+                                      valueColor:
+                                          AlwaysStoppedAnimation(Colors.grey),
+                                    );
+                                  } else {
+                                    return Icon(null);
+                                  }
+                                })
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Row(
+                children: [
+                  Flexible(
+                    child: Container(
+                      child: StreamBuilder<String>(
+                          stream: ethernetStatusStreamController.stream,
+                          initialData: '',
+                          builder: (c, snapshot) {
+                            return Column(children: <Widget>[
+                              ListTile(
+                                title: Text('Ethernet',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppConstants.clrBlack)),
+                                subtitle: Text(snapshot.data,
+                                    style: TextStyle(
+                                        color: AppConstants.clrBlack)),
+                              )
+
+
+                            ]);
+                          }),
+                    ),flex: 1,
+                  ),
+                  Flexible(
+                    child: Container(
+                      child: StreamBuilder<String>(
+                          stream: hotspotFirmwareStreamController.stream,
+                          initialData: '',
+                          builder: (c, snapshot) {
+                            return Column(children: <Widget>[
+                              ListTile(
+                                title: Text('Firmware Version',
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: AppConstants.clrBlack)),
+                                subtitle: Text(snapshot.data,
+                                    style: TextStyle(
+                                        color: AppConstants.clrBlack)),
+                              )
+                            ]);
+                          }),
+                    ),flex: 1,
+                  ),
+                ],
+              ),
+              Container(
+                margin: EdgeInsets.only(bottom: 20),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Flexible(
+                      child: Container(
+                        child: StreamBuilder<String>(
+                            stream: wifiSsidStreamController.stream,
+                            initialData: '',
+                            builder: (c, snapshot) {
+                              return Column(children: <Widget>[
+                                ListTile(
+                                  title: Text('WiFi Network',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppConstants.clrBlack)),
+                                  subtitle: Text(snapshot.data,
+                                      style: TextStyle(
+                                          color: AppConstants.clrBlack)),
+                                )
+                              ]);
+                            }),
+                      ),flex: 1,
+                    ),
+                    Flexible(
+                      child: Container(
+                        child: StreamBuilder<String>(
+                            stream: hotspotSerialStreamController.stream,
+                            initialData: '',
+                            builder: (c, snapshot) {
+                              return Column(children: <Widget>[
+                                ListTile(
+                                  title: Text('Serial Number',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: AppConstants.clrBlack)),
+                                  subtitle: Text(snapshot.data,
+                                      style: TextStyle(
+                                          color: AppConstants.clrBlack)),
+                                )
+                              ]);
+                            }),
+                      ),flex: 1,
+                    )
+                  ],
+                ),
+              ),
+              SizedBox(height: 20),
+              Container(
+                child: StreamBuilder<bool>(
                     stream: charReadStatusStreamController.stream,
                     initialData: false,
                     builder: (c, snapshot) {
-                      if (snapshot.data == false) {
-                        return CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation(Colors.grey),
-                        );
+                      if (snapshot.data == true) {
+                        return ButtonWidget(
+                            context, AppConstants.strConfigureWiFi, () {
+                          Navigator.of(context)
+                              .push(MaterialPageRoute(builder: (context) {
+                            return WifiAvailableScreen(
+                                currentWifiSsid: wifiSsidResult,
+                                device: widget.device,
+                                wifiServicesChar: wifiServicesChar,
+                                wifiConfiguredServicesChar:
+                                    wifiConfiguredServicesChar,
+                                wifiSsidChar: wifiSsidChar,
+                                wifiConnectChar: wifiConnectChar,
+                                wifiRemoveChar: wifiRemoveChar);
+                          }));
+                        }, AppConstants.clrGreen, null);
                       } else {
                         return Icon(null);
                       }
-                    })),
-          ),
-          StreamBuilder<String>(
-              stream: wifiSsidStreamController.stream,
-              initialData: 'None',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Wi-Fi Network'),
-                    subtitle: Text(snapshot.data),
-                    trailing: StreamBuilder<bool>(
-                        stream: charReadStatusStreamController.stream,
-                        initialData: false,
-                        builder: (c, snapshot) {
-                          if (snapshot.data == true) {
-                            return RaisedButton(
-                              child: Text('CONFIGURE'),
-                              color: Colors.black,
-                              textColor: Colors.white,
-                              onPressed: () {
-                                Navigator.of(context)
-                                    .push(MaterialPageRoute(builder: (context) {
-                                  return WifiAvailableScreen(
-                                      currentWifiSsid: wifiSsidResult,
-                                      device: widget.device,
-                                      wifiServicesChar: wifiServicesChar,
-                                      wifiConfiguredServicesChar:
-                                          wifiConfiguredServicesChar,
-                                      wifiSsidChar: wifiSsidChar,
-                                      wifiConnectChar: wifiConnectChar,
-                                      wifiRemoveChar: wifiRemoveChar);
-                                }));
-                              },
-                            );
-                          } else {
-                            return Icon(null);
-                          }
-                        }),
-                  )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: ethernetStatusStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Ethernet'),
-                    subtitle: Text(snapshot.data),
-                  )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: hotspotNameStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Name'),
-                    subtitle: Text(snapshot.data),
-                  )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: hotspotFirmwareStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Firmware Version'),
-                    subtitle: Text(snapshot.data),
-                  )
-                ]);
-              }),
-          StreamBuilder<String>(
-              stream: hotspotSerialStreamController.stream,
-              initialData: '',
-              builder: (c, snapshot) {
-                return Column(children: <Widget>[
-                  ListTile(
-                    title: Text('Serial Number'),
-                    subtitle: Text(snapshot.data),
-                  )
-                ]);
-              }),
-          ListTile(
-            title: Text('Diagnostic Report'),
-            trailing: StreamBuilder<bool>(
-                stream: charReadStatusStreamController.stream,
-                initialData: false,
-                builder: (c, snapshot) {
-                  if (snapshot.data == true) {
-                    return RaisedButton(
-                      child: Text('RUN'),
-                      color: Colors.black,
-                      textColor: Colors.white,
-                      onPressed: () {
-                        Navigator.of(context)
-                            .push(MaterialPageRoute(builder: (context) {
-                          return DiagnosticsScreen(
-                              device: widget.device,
-                              hotspotDiagnosticsChar: hotspotDiagnosticsChar,
-                              hotspotName: hotspotName,
-                              hotspotPublicKey: publicKeyResult);
-                        }));
-                      },
-                    );
-                  } else {
-                    return Icon(null);
-                  }
-                }),
-          ),
-        ]),
-      ),
+                    }),
+              ),
+              Flexible(child: Container(color: Colors.transparent,),),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  GestureDetector(
+                    onTap: (){
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(builder: (context) {
+                        return DiagnosticsScreen(
+                            device: widget.device,
+                            hotspotDiagnosticsChar: hotspotDiagnosticsChar,
+                            hotspotName: hotspotName,
+                            hotspotPublicKey: publicKeyResult);
+                      }));
+                    },
+                    child: Container(
+                      color: Colors.transparent,
+                      padding: EdgeInsets.only(top: 15,bottom: 15),
+                      child: Wrap(
+                        children: [
+                          Text('Diagnostic Report',
+                              style: TextStyle(
+                                  color: AppConstants.clrBlack,fontSize: 16)),
+                          SizedBox(width: 20,),
+                          Icon(Icons.arrow_forward_ios,color: Colors.blue,)
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 50,)
+            ]),
+          )),
     );
   }
 }

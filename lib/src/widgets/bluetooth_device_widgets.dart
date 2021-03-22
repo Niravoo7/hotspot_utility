@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_blue/flutter_blue.dart';
 import 'package:flutter_icons/flutter_icons.dart';
+import 'package:hotspotutility/constant.dart';
 
 class ScanResultTile extends StatelessWidget {
   const ScanResultTile({Key key, this.result, this.onTap}) : super(key: key);
@@ -17,6 +18,7 @@ class ScanResultTile extends StatelessWidget {
           Text(
             result.advertisementData.localName,
             overflow: TextOverflow.ellipsis,
+            style: TextStyle(fontSize: AppConstants.size_large),
           ),
         ],
       );
@@ -80,43 +82,89 @@ class ScanResultTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ExpansionTile(
-      title: _buildTitle(context),
-      leading: (() {
-        if (result.rssi <= -100) {
-          return Icon(MaterialCommunityIcons.signal_cellular_1);
-        } else if (result.rssi > -100 && result.rssi <= -70) {
-          return Icon(MaterialCommunityIcons.signal_cellular_2);
-        } else {
-          return Icon(MaterialCommunityIcons.signal_cellular_3);
-        }
-      }()),
-      trailing: RaisedButton(
-        child: Text('CONNECT'),
-        color: Colors.black,
-        textColor: Colors.white,
-        onPressed: (result.advertisementData.connectable) ? onTap : null,
+    return SafeArea(
+      child: GestureDetector(
+        onTap: (result.advertisementData.connectable) ? onTap : null,
+        child: Container(
+          color: Colors.transparent,
+            child: Row(
+          children: [
+            Padding(
+              padding: const EdgeInsets.only(left: 20),
+              child: Image.asset(AppConstants.img_bluetooth,
+                  color: AppConstants.clrBlue, height: 25),
+            ),
+            Flexible(
+              child: Container(
+                  color: Colors.transparent,
+                  padding: const EdgeInsets.only(left: 20),
+                  width: MediaQuery.of(context).size.width,
+                  child: _buildTitle(context)),
+              flex: 1,
+            ),
+            Container(
+              color: Colors.transparent,
+              padding:
+                  EdgeInsets.only(left: 30, right: 30, top: 20, bottom: 20),
+              child: Icon(
+                Icons.arrow_forward_ios,
+                size: 20,
+                color: AppConstants.clrBlue,
+              ),
+            )
+          ],
+        )
+
+            /*ExpansionTile(
+            title: _buildTitle(context),
+            leading: (() {
+              return Padding(
+                padding: const EdgeInsets.only(left: 20),
+                child: Image.asset(AppConstants.img_bluetooth,
+                    color: AppConstants.clrBlue, height: 25),
+              );
+            }()),
+            trailing: GestureDetector(
+              child: Container(
+                color: Colors.transparent,
+                padding:
+                    EdgeInsets.only(left: 30, right: 30, top: 20, bottom: 20),
+                child: Icon(
+                  Icons.arrow_forward_ios,
+                  size: 20,
+                  color: AppConstants.clrBlue,
+                ),
+              ),
+              onTap: (result.advertisementData.connectable) ? onTap : null,
+            ),
+            children: <Widget>[
+              */ /*_buildAdvRow(context, 'Complete Local Name',
+                  result.advertisementData.localName),
+              _buildAdvRow(context, 'Tx Power Level',
+                  '${result.advertisementData.txPowerLevel ?? 'N/A'}'),
+              _buildAdvRow(
+                  context,
+                  'Manufacturer Data',
+                  getNiceManufacturerData(
+                          result.advertisementData.manufacturerData) ??
+                      'N/A'),
+              _buildAdvRow(
+                  context,
+                  'Service UUIDs',
+                  (result.advertisementData.serviceUuids.isNotEmpty)
+                      ? result.advertisementData.serviceUuids
+                          .join(', ')
+                          .toUpperCase()
+                      : 'N/A'),
+              _buildAdvRow(
+                  context,
+                  'Service Data',
+                  getNiceServiceData(result.advertisementData.serviceData) ??
+                      'N/A'),*/ /*
+            ],
+          ),*/
+            ),
       ),
-      children: <Widget>[
-        _buildAdvRow(
-            context, 'Complete Local Name', result.advertisementData.localName),
-        _buildAdvRow(context, 'Tx Power Level',
-            '${result.advertisementData.txPowerLevel ?? 'N/A'}'),
-        _buildAdvRow(
-            context,
-            'Manufacturer Data',
-            getNiceManufacturerData(
-                    result.advertisementData.manufacturerData) ??
-                'N/A'),
-        _buildAdvRow(
-            context,
-            'Service UUIDs',
-            (result.advertisementData.serviceUuids.isNotEmpty)
-                ? result.advertisementData.serviceUuids.join(', ').toUpperCase()
-                : 'N/A'),
-        _buildAdvRow(context, 'Service Data',
-            getNiceServiceData(result.advertisementData.serviceData) ?? 'N/A'),
-      ],
     );
   }
 }
