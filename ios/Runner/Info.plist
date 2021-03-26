@@ -4,6 +4,8 @@
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>KOWOP Hotspot</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -24,10 +26,26 @@
 	<string>public.app-category.utilities</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppleMusicUsageDescription</key>
+	<string>This app requires Music permission to listen Hotspots music</string>
 	<key>NSBluetoothAlwaysUsageDescription</key>
 	<string>This app requires bluetooth to connect to Hotspots</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>This app requires bluetooth to connect to Hotspots</string>
+	<key>NSCalendarsUsageDescription</key>
+	<string>This app requires Calendars permission to connect Hotspots List</string>
+	<key>NSContactsUsageDescription</key>
+	<string>This app requires Contact permission to connect Hotspots List</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>This app requires location to create Hotspots</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>This app requires location to create Hotspots</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>This app requires location to create Hotspots</string>
+	<key>NSMotionUsageDescription</key>
+	<string>This app requires Motion permission to connect Hotspots</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>This app requires Speech Recognition permission to create Hotspots</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

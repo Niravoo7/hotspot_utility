@@ -67,10 +67,8 @@ class _WifiAvailableScreenState extends State<WifiAvailableScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: CommonAppBar(context,() {
-
+        appBar: CommonAppBar(context, () {
           Navigator.pop(context);
-
         }),
         body: SingleChildScrollView(
             child: Column(
@@ -86,63 +84,79 @@ class _WifiAvailableScreenState extends State<WifiAvailableScreen> {
                   textAlign: TextAlign.center,
                 )),
             Container(
-              margin:  EdgeInsets.only(top: 15,left: 10,right: 10),
+              margin: EdgeInsets.only(top: 15, left: 10, right: 10),
               child: StreamBuilder<List<String>>(
                   stream: wifiSsidListStreamController.stream,
                   initialData: [],
                   builder: (c, snapshot) {
-                    return ListView.builder(
-                      physics: NeverScrollableScrollPhysics(),
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
-                      itemCount: snapshot.data.length,
-                      itemBuilder: (context, index) {
-                        return GestureDetector(
-                          child: Container(
-                            color: Colors.transparent,
-                            padding: EdgeInsets.only(
-                                left: 25, right: 25, top: 10, bottom: 10),
-                            width: MediaQuery.of(context).size.width,
-                            child: Row(children: [
-                              Image.asset(
-                                AppConstants.img_wifi,
-                                height: 20,
-                                color: snapshot.data[index].toString() ==
-                                        widget.currentWifiSsid
-                                    ? AppConstants.clrBlue
-                                    : AppConstants.clrGrey,
-                              ),
-                              Container(
-                                  margin: EdgeInsets.only(left: 20, right: 20),
-                                  child: Text(snapshot.data[index].toString())),
-                              Flexible(
-                                  child: Container(
-                                color: Colors.transparent,
-                              )),
-                              Icon(
-                                Icons.arrow_forward_ios,
-                                size: 20,
-                                color: AppConstants.clrBlue,
-                              )
-                            ]),
-                          ),
-                          onTap: () {
-                            Navigator.of(context)
-                                .push(MaterialPageRoute(builder: (context) {
-                              return WifiConnectScreen(
-                                  currentWifiSsid: widget.currentWifiSsid,
-                                  device: widget.device,
-                                  wifiNetworkSelected:
-                                      snapshot.data[index].toString(),
-                                  wifiSsidChar: widget.wifiSsidChar,
-                                  wifiConfiguredServices: configuredSsidResults,
-                                  wifiConnectChar: widget.wifiConnectChar,
-                                  wifiRemoveChar: widget.wifiRemoveChar);
-                            }));
-                          },
-                        );
-                      },
-                    );
+                    if (snapshot == null ||
+                        snapshot.data == null ||
+                        snapshot.data.length == 0) {
+                      return Container(
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width,
+                        margin: EdgeInsets.only(top: 100),
+                        child: CircularProgressIndicator(
+                          valueColor: AlwaysStoppedAnimation(Colors.grey),
+                        ),
+                      );
+                    } else {
+                      return ListView.builder(
+                        physics: NeverScrollableScrollPhysics(),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        itemCount: snapshot.data.length,
+                        itemBuilder: (context, index) {
+                          return GestureDetector(
+                            child: Container(
+                              color: Colors.transparent,
+                              padding: EdgeInsets.only(
+                                  left: 25, right: 25, top: 10, bottom: 10),
+                              width: MediaQuery.of(context).size.width,
+                              child: Row(children: [
+                                Image.asset(
+                                  AppConstants.img_wifi,
+                                  height: 20,
+                                  color: snapshot.data[index].toString() ==
+                                          widget.currentWifiSsid
+                                      ? AppConstants.clrBlue
+                                      : AppConstants.clrGrey,
+                                ),
+                                Container(
+                                    margin:
+                                        EdgeInsets.only(left: 20, right: 20),
+                                    child:
+                                        Text(snapshot.data[index].toString())),
+                                Flexible(
+                                    child: Container(
+                                  color: Colors.transparent,
+                                )),
+                                Icon(
+                                  Icons.arrow_forward_ios,
+                                  size: 20,
+                                  color: AppConstants.clrBlue,
+                                )
+                              ]),
+                            ),
+                            onTap: () {
+                              Navigator.of(context)
+                                  .push(MaterialPageRoute(builder: (context) {
+                                return WifiConnectScreen(
+                                    currentWifiSsid: widget.currentWifiSsid,
+                                    device: widget.device,
+                                    wifiNetworkSelected:
+                                        snapshot.data[index].toString(),
+                                    wifiSsidChar: widget.wifiSsidChar,
+                                    wifiConfiguredServices:
+                                        configuredSsidResults,
+                                    wifiConnectChar: widget.wifiConnectChar,
+                                    wifiRemoveChar: widget.wifiRemoveChar);
+                              }));
+                            },
+                          );
+                        },
+                      );
+                    }
                   }),
             ),
           ],
