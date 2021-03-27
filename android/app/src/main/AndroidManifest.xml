@@ -19,6 +19,7 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:icon="@mipmap/launcher_icon"
+        android:allowBackup="false"
         android:label="KOWOP Hotspot">
         <activity
             android:name=".MainActivity"
